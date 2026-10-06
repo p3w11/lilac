@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lilac — админка</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23b18cff'/><circle cx='50' cy='50' r='14' fill='%234c2f86'/></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <div class="admin-wrap">
+    <header class="admin-head">
+      <div class="logo"><span class="flower"></span> Lilac <span class="admin-badge">админка</span></div>
+      <div class="grow"></div>
+      <a class="icon-btn" href="/chat">В чат</a>
+      <button class="icon-btn" id="logoutBtn" type="button">Выйти</button>
+    </header>
+
+    <div class="cards" id="cards"></div>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Пользователи</h2>
+        <span class="muted" id="usersCount"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th>Имя</th>
+              <th>Логин</th>
+              <th>Сообщений</th>
+              <th>Регистрация</th>
+              <th>Активность</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Последние сообщения</h2>
+        <div class="danger-zone">
+          <button class="btn-mini" id="clearGeneral" type="button">Очистить общий чат</button>
+          <button class="btn-mini danger" id="clearAll" type="button">Очистить всё</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th>Кто</th>
+              <th>Чат</th>
+              <th>Текст</th>
+              <th>Время</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="messagesBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
