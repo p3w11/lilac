@@ -9,6 +9,7 @@ const auth = require('./lib/auth');
 const db = require('./lib/db');
 const chat = require('./lib/chat');
 const limit = require('./lib/ratelimit');
+const adminPanel = require('./lib/admin');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
