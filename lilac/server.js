@@ -108,6 +108,10 @@ app.get('/api/users', auth.requireAuth, (req, res) => {
   res.json({ users: db.listUsers(req.user.id) });
 });
 
+// Админка: страница /admin и её API. Обязательно до catch-all ниже.
+adminPanel.attach(app);
+adminPanel.ensureAdmin().catch((err) => console.error('[admin]', err.message));
+
 /* ================= админка ================= */
 
 const admin = [auth.requireAuth, auth.requireAdmin];
