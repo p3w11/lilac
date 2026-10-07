@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lilac — чат</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23b18cff'/><circle cx='50' cy='50' r='14' fill='%234c2f86'/></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="logo"><span class="flower"></span> Lilac</div>
+      </div>
+
+      <div class="rooms" id="rooms"></div>
+
+      <div class="create-row">
+        <button class="icon-btn" id="newGroupBtn" type="button">+ Группа</button>
+        <button class="icon-btn" id="newChannelBtn" type="button">+ Канал</button>
+      </div>
+
+      <div class="online-box">
+        <div class="section-title">Сейчас онлайн</div>
+        <div id="onlineList"></div>
+      </div>
+
+      <div class="me">
+        <span class="me-avatar" id="meAvatar">?</span>
+        <span class="grow">
+          <b id="meName">—</b>
+          <span class="me-login" id="meLogin"></span>
+        </span>
+        <div class="me-actions">
+          <button class="icon-btn" id="profileBtn" type="button">Профиль</button>
+          <button class="icon-btn" id="settingsBtn" type="button">Настройки</button>
+          <button class="icon-btn" id="logoutBtn" type="button">Выйти</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-head">
+        <button class="menu-btn" id="menuBtn" type="button">☰</button>
+        <div style="flex:1;min-width:0">
+          <div class="title" id="roomTitle">Общий чат</div>
+          <p class="sub" id="roomSub">Все, кто сейчас в Lilac</p>
+        </div>
+        <button class="icon-btn sound-btn" id="soundBtn" type="button" title="Звуки сайта">🔔</button>
+        <a class="icon-btn admin-btn" id="adminBtn" href="/admin" hidden>Админ</a>
+        <button class="icon-btn" id="callBtn" type="button" hidden>Звонок</button>
+        <button class="icon-btn" id="newChatBtn" type="button">+ Написать другу</button>
+      </header>
+
+      <!-- Панель звонка живёт здесь же: занимает верх переписки и по тесн
+           сообщения, как в Дискорде. Читать сообщения можно прямо во время звонка. -->
+      <div class="call-window" id="callWindow" hidden>
+        <!-- экран 1: кто-то звонит -->
+        <div class="call-view call-view-in" id="callInView" hidden>
+          <span class="call-avatar sm" id="callInAvatar"></span>
+          <div class="call-view-name" id="callInName">—</div>
+          <div class="call-view-sub" id="callInSub">входящий звонок…</div>
+          <div class="call-btns">
+            <button class="round-btn decline" id="callDecline" type="button" title="Отклонить" aria-label="Отклонить">
+              <svg class="rb-ico" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="ico-main" d="M12 8.6c-1.7 0-3.4.3-4.9.8v3.3c0 .4-.2.8-.6 1a13 13 0 0 0-2.8 2c-.3.3-.8.3-1.1 0L1 14.1a1 1 0 0 1 0-1.4C4.4 10.5 8.1 9 12 9s7.6 1.5 11 3.7a1 1 0 0 1 0 1.4l-1.6 1.6c-.3.3-.8.3-1.1 0a13 13 0 0 0-2.8-2c-.4-.2-.6-.6-.6-1V9.4c-1.5-.5-3.2-.8-4.9-.8Z"/>
+              </svg>
+            </button>
+            <button class="round-btn accept" id="callAccept" type="button" title="Ответить" aria-label="Ответить">
+              <svg class="rb-ico" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="ico-main" d="M9.6 16.2 5.4 12l1.4-1.4 2.8 2.8 7.6-7.6L18.6 7.2 9.6 16.2Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="call-view-error" id="callInError"></div>
+        </div>
+
+        <!-- экран 2: идёт разговор -->
+        <div class="call-view call-view-active" id="callActiveView" hidden>
+          <div class="call-main" id="callMain">
+            <!-- сцена: сюда попадают все показы экрана, их может быть несколько -->
+            <div class="call-stage" id="callStage" hidden></div>
+
+            <!-- участники стоят рядом со сценой, а не под ней -->
+            <div class="call-people" id="callPeople">
+              <div class="call-side" id="callSidePeer">
+                <span class="call-avatar" id="callPeerAvatar"></span>
+                <div class="call-side-name" id="callPeerName">—</div>
+                <div class="call-side-state" id="callPeerState">звоним…</div>
+              </div>
+              <div class="call-side" id="callSideMe">
+                <span class="call-avatar" id="callMeAvatar"></span>
+                <div class="call-side-name" id="callMeName">—</div>
+                <div class="call-side-state" id="callMeState">ты</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="call-levels" id="callLevels" aria-hidden="true"></div>
+          <div class="call-view-error" id="callWinError"></div>
+
+          <button class="call-retry" id="callRetry" type="button" hidden>Позвонить ещё раз</button>
+
+          <div class="call-btns">
+            <!-- иконки без подписей: подсказка по наведению -->
+            <button class="round-btn mic" id="callMute" type="button" title="Микрофон" aria-label="Микрофон" aria-pressed="false">
+              <svg class="rb-ico" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="ico-main" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/>
+                <path class="ico-main" d="M17.3 11a5.3 5.3 0 0 1-10.6 0H5a7 7 0 0 0 6 6.9V21h2v-3.1a7 7 0 0 0 6-6.9h-1.7Z"/>
+                <path class="ico-slash" d="M4.6 2.9 2.9 4.6l16.5 16.5 1.7-1.7L4.6 2.9Z"/>
+              </svg>
+            </button>
+            <button class="round-btn screen" id="callScreenBtn" type="button" title="Показать экран" aria-label="Показать экран" aria-pressed="false">
+              <svg class="rb-ico" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="ico-main" d="M20 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 12H4V6h16v10Z"/>
+                <path class="ico-main" d="M13 8.2 8.8 12.4h2.7v4.2h3v-4.2h2.7L13 8.2Z"/>
+              </svg>
+            </button>
+            <button class="round-btn hangup" id="callHangup" type="button" title="Завершить" aria-label="Завершить звонок">
+              <svg class="rb-ico" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="ico-main" d="M12 8.6c-1.7 0-3.4.3-4.9.8v3.3c0 .4-.2.8-.6 1a13 13 0 0 0-2.8 2c-.3.3-.8.3-1.1 0L1 14.1a1 1 0 0 1 0-1.4C4.4 10.5 8.1 9 12 9s7.6 1.5 11 3.7a1 1 0 0 1 0 1.4l-1.6 1.6c-.3.3-.8.3-1.1 0a13 13 0 0 0-2.8-2c-.4-.2-.6-.6-.6-1V9.4c-1.5-.5-3.2-.8-4.9-.8Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typing"></div>
+
+      <form class="composer" id="composer">
+        <div class="composer-row" id="composerRow">
+          <textarea id="input" placeholder="Сообщение... (Enter — отправить, Shift+Enter — новая строка)" maxlength="2000"></textarea>
+          <button class="send" type="submit">Отправить</button>
+        </div>
+        <div class="composer-note" id="composerNote" hidden>В канале могут писать только администраторы</div>
+      </form>
+    </main>
+  </div>
+
+  <div class="modal-back" id="modal" hidden>
+    <div class="modal">
+      <h3>Написать другу</h3>
+      <input id="peerSearch" placeholder="Поиск по логину" autocomplete="off">
+      <div class="modal-list" id="peerList"></div>
+      <button class="icon-btn" id="closeModal" type="button" style="margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal-back" id="profileModal" hidden>
+    <div class="modal">
+      <h3>Мой профиль</h3>
+
+      <label for="pfName">Отображаемое имя</label>
+      <input id="pfName" maxlength="32" placeholder="Как вас видят друзья">
+      <div class="hint" id="pfLogin"></div>
+
+      <label>Аватар</label>
+      <div class="avatar-editor">
+        <span class="call-avatar md" id="pfAvatarPreview"></span>
+        <div class="avatar-editor-actions">
+          <input type="file" id="pfAvatarFile" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+          <button class="icon-btn" id="pfAvatarPick" type="button">Выбрать картинку</button>
+          <button class="icon-btn" id="pfAvatarClear" type="button">Убрать</button>
+          <div class="hint">PNG, JPEG, WebP или GIF. До 400 КБ.</div>
+        </div>
+      </div>
+
+      <label for="pfBio">О себе</label>
+      <textarea id="pfBio" maxlength="200" rows="3" placeholder="Пара слов о тебе"></textarea>
+      <div class="hint"><span id="pfBioCount">0</span>/200</div>
+
+      <label for="pfOld">Текущий пароль</label>
+      <input id="pfOld" type="password" autocomplete="current-password" placeholder="Для смены пароля">
+
+      <label for="pfNew">Новый пароль</label>
+      <input id="pfNew" type="password" autocomplete="new-password" placeholder="Минимум 6 символов">
+
+      <div class="error" id="pfError"></div>
+      <div class="row-btns">
+        <button class="icon-btn" id="pfCancel" type="button">Отмена</button>
+        <button class="btn" id="pfSave" type="button" style="margin:0;width:auto;padding:10px 22px">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="settingsModal" hidden>
+    <div class="modal modal-wide">
+      <h3>Настройки приватности</h3>
+      <p class="hint" style="margin:0 0 6px">
+        «Только контакты» — значит те, с кем у тебя уже есть личная переписка.
+      </p>
+      <div id="settingsList"></div>
+      <div class="error" id="stError"></div>
+      <div class="row-btns">
+        <button class="icon-btn" id="stCancel" type="button">Отмена</button>
+        <button class="btn" id="stSave" type="button" style="margin:0;width:auto;padding:10px 22px">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="roomModal" hidden>
+    <div class="modal modal-wide">
+      <h3 id="rmTitle">Группа</h3>
+      <div class="hint" id="rmKind"></div>
+
+      <label for="rmName" id="rmNameLabel">Название</label>
+      <input id="rmName" maxlength="40" placeholder="Название группы">
+
+      <label for="rmDesc">Описание</label>
+      <input id="rmDesc" maxlength="200" placeholder="О чём группа?">
+
+      <label class="check-row" id="rmPublicBlock">
+        <input type="checkbox" id="rmPublic" style="width:auto">
+        <span>Публичный канал — его сможет прочитать любой, кто зашёл на сайт</span>
+      </label>
+
+      <label>Участники</label>
+      <div class="search-row" style="padding:0 0 8px">
+        <input id="rmMemberSearch" placeholder="Добавить участника по логину" autocomplete="off">
+      </div>
+      <div class="modal-list members" id="rmMembers"></div>
+
+      <div class="error" id="rmError"></div>
+      <div class="row-btns">
+        <button class="icon-btn danger-text" id="rmLeave" type="button">Покинуть</button>
+        <div class="grow"></div>
+        <button class="icon-btn" id="rmClose" type="button">Закрыть</button>
+        <button class="btn" id="rmSave" type="button" style="margin:0;width:auto;padding:10px 22px">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="createModal" hidden>
+    <div class="modal">
+      <h3 id="cmTitle">Новая группа</h3>
+      <label for="cmName" id="cmNameLabel">Название</label>
+      <input id="cmName" maxlength="40" placeholder="Название">
+      <label for="cmDesc">Описание</label>
+      <input id="cmDesc" maxlength="200" placeholder="Необязательно">
+      <label class="check-row" id="cmPublicBlock">
+        <input type="checkbox" id="cmPublic" style="width:auto">
+        <span>Публичный канал</span>
+      </label>
+      <div class="error" id="cmError"></div>
+      <div class="row-btns">
+        <button class="icon-btn" id="cmCancel" type="button">Отмена</button>
+        <button class="btn" id="cmCreate" type="button" style="margin:0;width:auto;padding:10px 22px">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="peerModal" hidden>
+    <div class="modal">
+      <h3 id="pmName">Профиль</h3>
+      <div class="hint" id="pmLogin"></div>
+      <div id="pmBody"></div>
+      <div class="row-btns">
+        <button class="icon-btn" id="pmClose" type="button">Закрыть</button>
+        <button class="btn" id="pmWrite" type="button" style="margin:0;width:auto;padding:10px 22px">Написать</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/sound.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>

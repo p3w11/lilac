@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: lilac
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/me
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # Сгенерируй длинную случайную строку: https://jwt.io
+      - key: JWT_SECRET
+        generateValue: true
+      # Раскомментируй, чтобы регистрация была только по коду (для друзей)
+      # - key: INVITE_CODE
+      #   value: "мой-секретный-код"
