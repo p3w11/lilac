@@ -1,0 +1,12 @@
+﻿{
+  "name": "flux-hvh-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Портал сервера FLUX HvH",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "mysql2": "^3.24.6"
+  }
+}
